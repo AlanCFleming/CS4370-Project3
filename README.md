@@ -2,8 +2,9 @@
 This is a cuda program that covers "parallel prefix sum" for class.
 
 ## Editing BLOCKSIZE and MATRIXSIZE
-* A define statement for BLOCKSIZE can be found on line 15 of the .cu file
-* A define statement for MATRIXSIZE can be found on line 14 of the .cu file
+* A define statement for MATRIXSIZE can be found on line 8 of the .cu file
+* A define statement for BLOCKSIZE can be found on line 9 of the .cu file
+
 
 ## Compiling
 nvcc was used to compile these programs. This will create an executable program.
