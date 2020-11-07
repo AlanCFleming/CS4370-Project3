@@ -8,7 +8,7 @@ This is a cuda program that covers "parallel sum reduction and parallel prefix s
 
 ## Compiling
 nvcc was used to compile these programs. This will create an executable program.
-* Command for compiling prefix sum: nvcc flemingSumReduction.cu -o sumReduction
+* Command for compiling sum reduction: nvcc flemingSumReduction.cu -o sumReduction
 * Command for compiling prefix sum: nvcc flemingPrefixSum.cu -o prefixSum
 
 ## Running
