@@ -35,8 +35,10 @@ __global__ void sumReductionKernal(int* arr) {
 	}
 	
 	__syncthreads();
-	//write block sum to global memory
-	arr[blockIdx.x] = partialResult[0];
+	if(threadIdx.x == 0){
+		//write block sum to global memory
+		arr[blockIdx.x] = partialResult[0];
+	}
 }
 
 int main() {
