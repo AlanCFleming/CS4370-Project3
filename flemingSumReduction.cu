@@ -6,7 +6,7 @@
 
 //CONSTANTS
 #define MATRIXSIZE 131072
-#define BLOCKSIZE 128
+#define BLOCKSIZE 1024
 
 
 //Code to preform sum reduction using the cpu
