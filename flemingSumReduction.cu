@@ -74,7 +74,7 @@ int main() {
 
 	//calculate dimentions for gpu
 	dim3 dimBlock(BLOCKSIZE);
-	dim3 dimGrid(ceil(double(MATRIXSIZE)/dimBlock.x));
+	dim3 dimGrid(ceil(double(MATRIXSIZE)/dimBlock.x/2));
 
 	//Set up cuda events for recording runtime
 	cudaEvent_t start,stop;
