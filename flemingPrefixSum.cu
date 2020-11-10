@@ -112,7 +112,7 @@ int main() {
 	cudaEventDestroy(stop);
 
 	//copy sum from gpu
-	cudaMemcpy(gpuResult, dev_b, sizeof(int), cudaMemcpyDeviceToHost);
+	cudaMemcpy(gpuResult, dev_b, MATRIXSIZE * sizeof(int), cudaMemcpyDeviceToHost);
 
 	//print speedup
 	printf("CPU Runtime: %f\nGpu Runtime: %f\nSpeedup: %f\n", (double)cpuTime, (double)gpuTime, double(cpuTime / gpuTime));
