@@ -26,7 +26,7 @@ __global__ void sumReductionKernal(int* arr) {
 	partialResult[threadIdx.x] = arr[2*blockIdx.x*blockDim.x+threadIdx.x];
 
 	//Preform sum reduction
-	for(int stride = blockDim.x; stride >= 0; stride /= 2) {
+	for(unsigned int stride = blockDim.x; stride > 0; stride /= 2) {
 		__syncthreads();
 		if (threadIdx.x < stride){
 			partialResult[threadIdx.x] += partialResult[threadIdx.x + stride];
