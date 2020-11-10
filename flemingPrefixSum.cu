@@ -120,12 +120,19 @@ int main() {
 	//print reduction results
 	printf("CPU Result: %d\nGPU Result: %d\n", cpuResult, a[0]);
 	//verify results
-	if(cpuResult == a[0]) {
+	bool valid = true
+	for(int i = 0; i < MATRIXSIZE; i++) {	
+		if(cpuResult[i] != gpuResult[i]) {
+			valid = false;
+			break;
+		}
+	}
+	if(valid) {
 		printf("TEST PASSED\n");
 	} else {
 		printf("TEST FAILED\n");
 	}
-
+		
 	//free memory
 	free(a);
 	free(cpuResult);
