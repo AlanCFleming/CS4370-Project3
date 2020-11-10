@@ -44,6 +44,7 @@ __global__ void sumReductionKernal(int* input, int* output) {
 int main() {
 	
 	int *a = (int *)malloc(sizeof(int) * MATRIXSIZE); //allocate space for array
+	int *b = (int *)malloc(sizeof(int) * MATRIXSIZE); //allocate space for array
 	//initialize array
 	int init = 1325;
 	for(int i=0; i<MATRIXSIZE;i++){
@@ -65,7 +66,7 @@ int main() {
 	//Allocate memory on GPU compution. dev_b is used to store the results of the first pass of reduction
 	int *dev_a, *dev_b;
 	cudaMalloc((void **)(&dev_a), MATRIXSIZE *sizeof(int));
-	cudaMalloc((void **)(&dev_a), MATRIXSIZE *sizeof(int));
+	cudaMalloc((void **)(&dev_b), MATRIXSIZE *sizeof(int));
 
 	//copy memory to gpu
 	cudaMemcpy(dev_a,a, MATRIXSIZE * sizeof(int), cudaMemcpyHostToDevice);
