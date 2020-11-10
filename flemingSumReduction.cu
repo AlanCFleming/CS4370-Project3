@@ -9,11 +9,10 @@
 #define BLOCKSIZE 128
 
 
-//Code to preform sum reduction using the cpu.
-//Overwrites x[0] with the sum of X and returns it as an int
+//Code to preform sum reduction using the cpu
 int SumReductionCPU(int* x, int N){
-	int sum = x[0];
-	for(int i = 1; i < N; i++){
+	int sum = 0;
+	for(int i = 0; i < N; i++){
 		sum += x[i];
 	}
 	return sum;
@@ -102,9 +101,9 @@ int main() {
 	printf("CPU Result: %d\nGPU Result: %d\n", cpuResult, a[0]);
 	//verify results
 	if(cpuResult == a[0]) {
-		printf("TEST PASSED");
+		printf("TEST PASSED\n");
 	} else {
-		printf("TEST FAILED");
+		printf("TEST FAILED\n");
 	}
 
 	//free memory
