@@ -97,7 +97,7 @@ int main() {
 	printf("CPU Runtime: %f\nGpu Runtime: %f\nSpeedup: %f\n", (double)cpuTime, (double)gpuTime, double(cpuTime / gpuTime));
 
 	//print reduction results
-	printf("CPU Result: %d\nGPU Result%d\n", cpuResult, a[0]
+	printf("CPU Result: %d\nGPU Result%d\n", cpuResult, a[0]);
 	//verify results
 	if(cpuResult == a[0]) {
 		printf("TEST PASSED");
