@@ -13,8 +13,9 @@
 //Overwrites x[0] with the sum of X and returns it as an int
 int SumReductionCPU(int* x, int N){
 	int sum = x[0]
-	for(i = 1; i < N; i++)
+	for(i = 1; i < N; i++){
 		sum += x[i];
+	}
 	return sum;
 }
 
