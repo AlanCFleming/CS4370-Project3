@@ -22,7 +22,7 @@ int SumReductionCPU(int* x, int N){
 __global__ void sumReductionKernal(int* arr) {
 
 	//initialize Partial Result for thread	
-	__shared__ int partialResult[2 * blockDim.x];
+	__shared__ int partialResult[2 * BLOCKSIZE];
 	partialResult[threadIdx.x] = arr[2*blockIdx.x*blockDim.x+threadIdx.x];
 
 	//Preform sum reduction
