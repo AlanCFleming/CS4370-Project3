@@ -23,8 +23,10 @@ __global__ void sumReductionKernal(int* arr) {
 
 	//initialize Partial Result for thread	
 	__shared__ int partialResult[2 * BLOCKSIZE];
-	partialResult[threadIdx.x] = arr[2*blockIdx.x*blockDim.x+threadIdx.x];
-
+	unsigned int start = 2*blockIdx.x * blockDim.x
+	partialResult[threadIdx.x] = arr[start + threadIdx.x];
+	partialResult[blockDim.x + threadIdx.x] = arr[start +blockDim.x + threadIdx.x]
+	
 	//Preform sum reduction
 	for(unsigned int stride = blockDim.x; stride > 0; stride /= 2) {
 		__syncthreads();
