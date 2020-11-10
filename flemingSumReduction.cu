@@ -13,13 +13,13 @@
 //Overwrites x[0] with the sum of X and returns it as an int
 int SumReductionCPU(int* x, int N){
 	int sum = x[0];
-	for(i = 1; i < N; i++){
+	for(int i = 1; i < N; i++){
 		sum += x[i];
 	}
 	return sum;
 }
 
-__global__ void sumReductionKernal(int* arr} {
+__global__ void sumReductionKernal(int* arr) {
 
 	//initialize Partial Result for thread	
 	__shared__ int partialResult[2 * blockDim.x];
@@ -29,7 +29,7 @@ __global__ void sumReductionKernal(int* arr} {
 	for(unsigned int stride = blockDim.x; stride >= 0; stride /= 2) {
 		__synchthreads();
 		if (threadIdx.x < stride){
-			partialResult[threadIdx.x] += partialSum[threadIdx.x + stride];
+			partialResult[threadIdx.x] += partialResult[threadIdx.x + stride];
 		}
 	}
 	
@@ -42,7 +42,7 @@ int main() {
 	
 	int *a = (int *)malloc(sizeof(int) * MATRIXSIZE); //allocate space for array
 	//initialize array
-	init = 1325;
+	int init = 1325;
 	for(int i=0; i<MATRIXSIZE;i++){
 		init = 3125 * init % 6553;
 		a[i] = (init - 1000) % 97;
