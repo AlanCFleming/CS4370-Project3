@@ -18,13 +18,13 @@ int SumReductionCPU(int* x, int N){
 	return sum;
 }
 
-__global__ void sumReductionKernal(int* arr) {
+__global__ void sumReductionKernal(int* input, int* output) {
 
 	//initialize Partial Result for thread	
 	__shared__ int partialResult[2 * BLOCKSIZE];
 	unsigned int start = 2*blockIdx.x * blockDim.x;
-	partialResult[threadIdx.x] = arr[start + threadIdx.x];
-	partialResult[blockDim.x + threadIdx.x] = arr[start +blockDim.x + threadIdx.x];
+	partialResult[threadIdx.x] = input[start + threadIdx.x];
+	partialResult[blockDim.x + threadIdx.x] = input[start +blockDim.x + threadIdx.x];
 	
 	//Preform sum reduction
 	for(unsigned int stride = blockDim.x; stride > 0; stride /= 2) {
@@ -37,7 +37,7 @@ __global__ void sumReductionKernal(int* arr) {
 	__syncthreads();
 	if(threadIdx.x == 0){
 		//write block sum to global memory
-		arr[blockIdx.x] = partialResult[0];
+		output[blockIdx.x] = partialResult[0];
 	}
 }
 
@@ -49,6 +49,7 @@ int main() {
 	for(int i=0; i<MATRIXSIZE;i++){
 		init = 3125 * init % 6553;
 		a[i] = (init - 1000) % 97;
+		b[i] = 0;
 	}
 
 	//Test CPU reduction
@@ -61,12 +62,14 @@ int main() {
 	//Calculate runtime
 	float cpuTime= (float(t2-t1)/CLOCKS_PER_SEC*1000);
 
-	//Allocate memory on GPU compution
-	int *dev_a;
+	//Allocate memory on GPU compution. dev_b is used to store the results of the first pass of reduction
+	int *dev_a, *dev_b;
+	cudaMalloc((void **)(&dev_a), MATRIXSIZE *sizeof(int));
 	cudaMalloc((void **)(&dev_a), MATRIXSIZE *sizeof(int));
 
 	//copy memory to gpu
 	cudaMemcpy(dev_a,a, MATRIXSIZE * sizeof(int), cudaMemcpyHostToDevice);
+	cudaMemcpy(dev_b,b, MATRIXSIZE * sizeof(int), cudaMemcpyHostToDevice);
 
 	//calculate dimentions for gpu
 	dim3 dimBlock(BLOCKSIZE);
@@ -80,9 +83,9 @@ int main() {
 	cudaEventRecord(start,0);
 	
 	//Calculate GPU Reduction for each block
-	sumReductionKernal<<<dimGrid, dimBlock>>>(dev_a);
+	sumReductionKernal<<<dimGrid, dimBlock>>>(dev_a, dev_b);
 	//Calculate GPU Recuction for block results
-	sumReductionKernal<<<dimGrid, dimBlock>>>(dev_a);
+	sumReductionKernal<<<dimGrid, dimBlock>>>(dev_b, dev_a);
 
 	//calculate runtime 
 	cudaEventRecord(stop,0);
@@ -111,6 +114,7 @@ int main() {
 	//free memory
 	free(a);
 	cudaFree(dev_a);
+	cudaFree(dev_b);
 	
 	return 0;
 }
