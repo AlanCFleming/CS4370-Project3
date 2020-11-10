@@ -12,7 +12,7 @@
 //Code to preform sum reduction using the cpu.
 //Overwrites x[0] with the sum of X and returns it as an int
 int SumReductionCPU(int* x, int N){
-	int sum = x[0]
+	int sum = x[0];
 	for(i = 1; i < N; i++){
 		sum += x[i];
 	}
@@ -33,7 +33,7 @@ __global__ void sumReductionKernal(int* arr} {
 		}
 	}
 	
-	__synchthreads()
+	__synchthreads();
 	//write block sum to global memory
 	arr[blockIdx.x] = partialResult[0];
 }
@@ -52,14 +52,14 @@ int main() {
 	//Get start time
 	clock_t t1 = clock();
 	//Calculate reduction
-	int cpuResult = SumReductionCPU(a, MATRIXSIZE)
+	int cpuResult = SumReductionCPU(a, MATRIXSIZE);
 	//Get stop time
 	clock_t t2 = clock();
 	//Calculate runtime
 	float cpuTime= (float(t2-t1)/CLOCKS_PER_SEC*1000);
 
 	//Allocate memory on GPU compution
-	int *dev_a
+	int *dev_a;
 	cudaMalloc((void **)(&dev_a), MATRIXSIZE *sizeof(int));
 
 	//copy memory to gpu
