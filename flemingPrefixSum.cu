@@ -120,7 +120,7 @@ int main() {
 	//print reduction results
 	printf("CPU Result: %d\nGPU Result: %d\n", cpuResult, a[0]);
 	//verify results
-	bool valid = true
+	bool valid = true;
 	for(int i = 0; i < MATRIXSIZE; i++) {	
 		if(cpuResult[i] != gpuResult[i]) {
 			valid = false;
