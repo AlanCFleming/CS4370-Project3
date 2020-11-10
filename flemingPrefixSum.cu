@@ -11,7 +11,7 @@
 
 //Code to prefix sum using the cpu
 void prefixSumCPU(int* x, int* y,  int N){
-	y[0] = x[0]
+	y[0] = x[0];
 	for(int i = 1; i < N; i++){
 		y[i] = y[i-1] + x[i];
 	}
@@ -30,7 +30,7 @@ __global__ void parallelPrefixSum(int* x, int* y, int inputSize) {
 
 	//Reduction step
 
-	for(int i = 1; stride <= BLOCKSIZE; stride *= 2){
+	for(int stride = 1; stride <= BLOCKSIZE; stride *= 2){
 		int index = (threadIdx.x + 1) * stride * 2 - 1;
 		if(index < 2 * BLOCKSIZE) {
 			scan_array[index] += scan_array[index - stride];
@@ -50,7 +50,7 @@ __global__ void parallelPrefixSum(int* x, int* y, int inputSize) {
 
 	//Output array
 	y[start + threadIdx.x] = scan_array[threadIdx.x];
-	y[start _ blockDim.x + threadIdx.x] = scan_array[blockDim.x + threadIdx.x];
+	y[start + blockDim.x + threadIdx.x] = scan_array[blockDim.x + threadIdx.x];
 }
 
 int main() {
@@ -64,6 +64,7 @@ int main() {
 	for(int i=0; i<MATRIXSIZE;i++){
 		init = 3125 * init % 6553;
 		a[i] = (init - 1000) % 97;
+		gpuResult[i] = 0;
 	}
 
 	//Test CPU reduction
@@ -85,7 +86,7 @@ int main() {
 
 	//copy memory to gpu
 	cudaMemcpy(dev_a,a, MATRIXSIZE * sizeof(int), cudaMemcpyHostToDevice);
-	cudaMemcpy(dev_b,b, MATRIXSIZE * sizeof(int), cudaMemcpyHostToDevice);
+	cudaMemcpy(dev_b,gpuResult, MATRIXSIZE * sizeof(int), cudaMemcpyHostToDevice);
 
 	//calculate dimentions for gpu
 	dim3 dimBlock(BLOCKSIZE);
@@ -98,7 +99,8 @@ int main() {
 	cudaEventCreate(&stop);
 	cudaEventRecord(start,0);
 	
-	//INSERT GPU FUNCTION
+	//calculate prefix sum
+	parallelPrefixSum<<<dimGrid, dimBlock>>>(dev_a, dev_b, MATRIXSIZE);
 	
 	//calculate runtime 
 	cudaEventRecord(stop,0);
@@ -110,7 +112,7 @@ int main() {
 	cudaEventDestroy(stop);
 
 	//copy sum from gpu
-	cudaMemcpy(a, dev_a, sizeof(int), cudaMemcpyDeviceToHost);
+	cudaMemcpy(gpuResult, dev_b, sizeof(int), cudaMemcpyDeviceToHost);
 
 	//print speedup
 	printf("CPU Runtime: %f\nGpu Runtime: %f\nSpeedup: %f\n", (double)cpuTime, (double)gpuTime, double(cpuTime / gpuTime));
