@@ -17,7 +17,7 @@ void prefixSumCPU(int* x, int* y,  int N){
 	}
 }
 
-__global__ void parallelPrefixSum(int* x, int* y, int* s, int inputSize) {
+__global__ void parallelPrefixSum(int* x, int* y, int inputSize) {
 	//allocate shared memory for block
 	__shared__ int scan_array[2*BLOCKSIZE];
 	
@@ -48,22 +48,10 @@ __global__ void parallelPrefixSum(int* x, int* y, int* s, int inputSize) {
 		__syncthreads();
 	}
 
-	if(threadIdx.x == blockDim.x-1) {
-		s[blockIdx.x] == scan_array[blockDim.x-1];
-	}
-
 	//Output array
 	y[start + threadIdx.x] = scan_array[threadIdx.x];
 	y[start + blockDim.x + threadIdx.x] = scan_array[blockDim.x + threadIdx.x];
 }
-
-__global__ void addBlocks(int* x, int* s, int blockCount){
-
-	if(blockIdx.x < blockCount-1) {
-		x[(blockIdx.x + 1) * blockDim.x + threadIdx] = x[(blockIdx.x +1) * blockDim.x +threadIdx.x] + s[blockIdx.x];
-	}
-}
-
 
 int main() {
 	
@@ -91,16 +79,14 @@ int main() {
 	//Calculate runtime
 	float cpuTime= (float(t2-t1)/CLOCKS_PER_SEC*1000);
 
-	//Allocate memory on GPU compution. dev_b is used to store the output, dev-c is used to store the auxilery array
-	int *dev_a, *dev_b, dev_c;
+	//Allocate memory on GPU compution. dev_b is used to store the results of the first pass of reduction
+	int *dev_a, *dev_b;
 	cudaMalloc((void **)(&dev_a), MATRIXSIZE *sizeof(int));
 	cudaMalloc((void **)(&dev_b), MATRIXSIZE *sizeof(int));
-	cudaMalloc((void **)(&dev_c), ceil(double(MATRIXSIZE)/BLOCKSIZE/2) * sizeof(int));
 
 	//copy memory to gpu
 	cudaMemcpy(dev_a,a, MATRIXSIZE * sizeof(int), cudaMemcpyHostToDevice);
 	cudaMemcpy(dev_b,gpuResult, MATRIXSIZE * sizeof(int), cudaMemcpyHostToDevice);
-
 
 	//calculate dimentions for gpu
 	dim3 dimBlock(BLOCKSIZE);
@@ -114,11 +100,7 @@ int main() {
 	cudaEventRecord(start,0);
 	
 	//calculate prefix sum
-	parallelPrefixSum<<<dimGrid, dimBlock>>>(dev_a, dev_b, dev_c, MATRIXSIZE);
-	//run prefix sum on auxilery array
-	parallelPrefixSum<<<dimGrid, dimBlock>>>(dev_c, dev_c, dev_a, MATRIXSIZE);
-	//Add auxilery array to output array
-	addBlock<<<dimGrid, dimBlock>>>(dev_b, dev_c, dimGrid.x);
+	parallelPrefixSum<<<dimGrid, dimBlock>>>(dev_a, dev_b, MATRIXSIZE);
 	
 	//calculate runtime 
 	cudaEventRecord(stop,0);
@@ -155,7 +137,6 @@ int main() {
 	free(gpuResult);
 	cudaFree(dev_a);
 	cudaFree(dev_b);
-	cudaFree(dev_c);
 	
 	return 0;
 }
