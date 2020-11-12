@@ -49,7 +49,7 @@ __global__ void parallelPrefixSum(int* x, int* y, int* s, int inputSize) {
 	}
 
 	if(threadIdx.x == blockDim.x-1) {
-		s[blockIdx.x] = scan_array[blockDim.x-1];
+		s[blockIdx.x] == scan_array[blockDim.x-1];
 	}
 
 	//Output array
@@ -60,7 +60,7 @@ __global__ void parallelPrefixSum(int* x, int* y, int* s, int inputSize) {
 __global__ void addBlocks(int* x, int* s, int blockCount){
 
 	if(blockIdx.x < blockCount-1) {
-		x[(blockIdx.x + 1) * blockDim.x + threadIdx.x] = x[(blockIdx.x +1) * blockDim.x +threadIdx.x] + s[blockIdx.x];
+		x[(blockIdx.x + 1) * blockDim.x + threadIdx] = x[(blockIdx.x +1) * blockDim.x +threadIdx.x] + s[blockIdx.x];
 	}
 }
 
@@ -92,7 +92,7 @@ int main() {
 	float cpuTime= (float(t2-t1)/CLOCKS_PER_SEC*1000);
 
 	//Allocate memory on GPU compution. dev_b is used to store the output, dev-c is used to store the auxilery array
-	int *dev_a, *dev_b, *dev_c;
+	int *dev_a, *dev_b, dev_c;
 	cudaMalloc((void **)(&dev_a), MATRIXSIZE *sizeof(int));
 	cudaMalloc((void **)(&dev_b), MATRIXSIZE *sizeof(int));
 	cudaMalloc((void **)(&dev_c), ceil(double(MATRIXSIZE)/BLOCKSIZE/2) * sizeof(int));
@@ -118,7 +118,7 @@ int main() {
 	//run prefix sum on auxilery array
 	parallelPrefixSum<<<dimGrid, dimBlock>>>(dev_c, dev_c, dev_a, MATRIXSIZE);
 	//Add auxilery array to output array
-	addBlocks<<<dimGrid, dimBlock>>>(dev_b, dev_c, dimGrid.x);
+	addBlock<<<dimGrid, dimBlock>>>(dev_b, dev_c, dimGrid.x);
 	
 	//calculate runtime 
 	cudaEventRecord(stop,0);
